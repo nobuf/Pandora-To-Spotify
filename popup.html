@@ -1,0 +1,81 @@
+<html>
+<head>
+<style>
+body {
+width:400px;
+}
+.ok {
+color:green;
+}
+.message {
+padding:5px 10px;
+background:#EEE;
+}
+textarea {
+width:100%;
+}
+table {
+width:100%;
+margin-top:20px;
+border-collapse:collapse;
+}
+td {
+padding: 8px;
+border-bottom:1px solid #CCC;
+font-size:14px;
+}
+th {
+padding: 8px;
+border-bottom:2px solid #999;
+}
+</style>
+<script src="jquery-1.6.2.min.js"></script>
+<script>
+var spotifyUris = [];
+var SPOTIFY_METADATA_API_ENDPOINT = 'http://ws.spotify.com/search/1/track.json';
+$(document).ready(function(){
+    chrome.tabs.executeScript(null, {file: "jquery-1.6.2.min.js"}, function(){
+        chrome.tabs.executeScript(null, {file: "content_script.js"});
+    });
+});
+chrome.extension.onRequest.addListener(function(data){
+    if (data && data.length > 0) {
+        $('#error').hide();
+        $('table').show();
+    }
+    $.each(data, function(index, value){
+        window.setTimeout(function(){
+            var query = 'artist:"' + value['artist'] + '"+track:"' + value['title'] + '"';
+            $.get(SPOTIFY_METADATA_API_ENDPOINT, {q:query}, function(trackInfo){
+                var isAvailable = 'no';
+                if (trackInfo['tracks'][0]['href']) {
+                    isAvailable = '<span class="ok">ok</span>';
+                    spotifyUris.push(trackInfo['tracks'][0]['href']);
+                }
+                $('tbody').append('<tr><td>' + value['artist'] + '</td><td>' + value['title'] + '</td><td>' + isAvailable + '</td></tr>');
+                if (index === data.length - 1) {
+                    $('table').before('<div class="message" id="done">Now, simply copy and paste the below text into Spotify playlist!</div><textarea></textarea>');
+                    $('textarea').val(spotifyUris.join("\n")).focus().select();
+                    $('#done').fadeIn();
+                }
+            });
+        }, 110); // no more than 10 requests per second
+    });
+});
+</script>
+</head>
+<body>
+<h1>Pandora --> Spotify</h1>
+<div class="message" id="error">The current page does not have any thumbed-up tracks. Please access your Pandora station page.</div>
+<table style="display:none;">
+    <thead>
+    <tr>
+        <th>Artist</th>
+        <th>Track</th>
+        <th>Spotify</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+</body>
+</html>
