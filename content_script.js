@@ -1,6 +1,6 @@
 
 (function(){
-    var titles = $('span.track_title');
+    var titles = $('table#tbl_thumbs_up').find('span.track_title');
     var data = [];
     for (var i = 0; titles.length > i; i++) {
         var artist = $(titles[i]).closest('tr').find('a[title="Artist details"]').text();

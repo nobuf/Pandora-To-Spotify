@@ -4,6 +4,9 @@
 body {
 width:400px;
 }
+p {
+margin:0;
+}
 .ok {
 color:green;
 }
@@ -31,7 +34,6 @@ border-bottom:2px solid #999;
 </style>
 <script src="jquery-1.6.2.min.js"></script>
 <script>
-var spotifyUris = [];
 var SPOTIFY_METADATA_API_ENDPOINT = 'http://ws.spotify.com/search/1/track.json';
 $(document).ready(function(){
     chrome.tabs.executeScript(null, {file: "jquery-1.6.2.min.js"}, function(){
@@ -42,6 +44,7 @@ chrome.extension.onRequest.addListener(function(data){
     if (data && data.length > 0) {
         $('#error').hide();
         $('table').show();
+        $('#done').fadeIn();
     }
     $.each(data, function(index, value){
         window.setTimeout(function(){
@@ -50,13 +53,11 @@ chrome.extension.onRequest.addListener(function(data){
                 var isAvailable = 'no';
                 if (trackInfo['tracks'][0]['href']) {
                     isAvailable = '<span class="ok">ok</span>';
-                    spotifyUris.push(trackInfo['tracks'][0]['href']);
+                    $('textarea').val($('textarea').val()+trackInfo['tracks'][0]['href']+"\n");
                 }
                 $('tbody').append('<tr><td>' + value['artist'] + '</td><td>' + value['title'] + '</td><td>' + isAvailable + '</td></tr>');
                 if (index === data.length - 1) {
-                    $('table').before('<div class="message" id="done">Now, simply copy and paste the below text into Spotify playlist!</div><textarea></textarea>');
-                    $('textarea').val(spotifyUris.join("\n")).focus().select();
-                    $('#done').fadeIn();
+                    $('textarea').focus().select();
                 }
             });
         }, 110); // no more than 10 requests per second
@@ -67,6 +68,10 @@ chrome.extension.onRequest.addListener(function(data){
 <body>
 <h1>Pandora --> Spotify</h1>
 <div class="message" id="error">The current page does not have any thumbed-up tracks. Please access your Pandora station page.</div>
+<div style="display:none;" class="message" id="done">
+    <p>Now, simply copy and paste the below text into Spotify playlist!</p>
+    <textarea></textarea>
+</div>
 <table style="display:none;">
     <thead>
     <tr>
