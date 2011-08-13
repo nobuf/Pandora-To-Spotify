@@ -51,7 +51,7 @@ chrome.extension.onRequest.addListener(function(data){
             var query = 'artist:"' + value['artist'] + '"+track:"' + value['title'] + '"';
             $.get(SPOTIFY_METADATA_API_ENDPOINT, {q:query}, function(trackInfo){
                 var isAvailable = 'no';
-                if (trackInfo['tracks'][0]['href']) {
+                if ('tracks' in trackInfo && trackInfo['tracks'].length > 0 && 'href' in trackInfo['tracks'][0]) {
                     isAvailable = '<span class="ok">ok</span>';
                     $('textarea').val($('textarea').val()+trackInfo['tracks'][0]['href']+"\n");
                 }
