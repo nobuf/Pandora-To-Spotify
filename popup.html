@@ -35,32 +35,70 @@ border-bottom:2px solid #999;
 <script src="jquery-1.6.2.min.js"></script>
 <script>
 var SPOTIFY_METADATA_API_ENDPOINT = 'http://ws.spotify.com/search/1/track.json';
+var GOOGLE_GEOCODING_API_ENDPOINT = 'http://maps.googleapis.com/maps/api/geocode/json';
+var countryCode = null;
 $(document).ready(function(){
-    chrome.tabs.executeScript(null, {file: "jquery-1.6.2.min.js"}, function(){
-        chrome.tabs.executeScript(null, {file: "content_script.js"});
-    });
-});
-chrome.extension.onRequest.addListener(function(data){
-    if (data && data.length > 0) {
-        $('#error').hide();
-        $('table').show();
-        $('#done').fadeIn();
-    }
-    $.each(data, function(index, value){
-        window.setTimeout(function(){
-            var query = 'artist:"' + value['artist'] + '"+track:"' + value['title'] + '"';
-            $.get(SPOTIFY_METADATA_API_ENDPOINT, {q:query}, function(trackInfo){
-                var isAvailable = 'no';
-                if ('tracks' in trackInfo && trackInfo['tracks'].length > 0 && 'href' in trackInfo['tracks'][0]) {
-                    isAvailable = '<span class="ok">ok</span>';
-                    $('textarea').val($('textarea').val()+trackInfo['tracks'][0]['href']+"\n");
+    var $queue = $('<div></div>');
+    $queue.queue(function(){
+        navigator.geolocation.getCurrentPosition(function(position){
+            $.get(GOOGLE_GEOCODING_API_ENDPOINT, {sensor:false, latlng:position.coords.latitude+','+position.coords.longitude}, function(locationData){
+                if ('status' in locationData && locationData['status'] == 'OK') {
+                    $.each(locationData['results'][0]['address_components'], function(index, value){
+                        if (value['types'][0] == 'country') {
+                            countryCode = value['short_name'];
+                            $queue.dequeue();
+                        }
+                    });
                 }
-                $('tbody').append('<tr><td>' + value['artist'] + '</td><td>' + value['title'] + '</td><td>' + isAvailable + '</td></tr>');
-                if (index === data.length - 1) {
-                    $('textarea').focus().select();
-                }
+            }).error(function(){
+                $queue.dequeue();
             });
-        }, 110); // no more than 10 requests per second
+        });
+        chrome.tabs.executeScript(null, {file: "jquery-1.6.2.min.js"}, function(){
+            chrome.tabs.executeScript(null, {file: "content_script.js"});
+        });
+    }).queue(function(){
+
+        chrome.extension.onRequest.addListener(function(data){
+            if (data && data.length > 0) {
+                $('#error').hide();
+                $('table').show();
+                $('#done').fadeIn();
+            }
+            $.each(data, function(index, value){
+                window.setTimeout(function(){
+                    var query = 'artist:"' + value['artist'] + '"+track:"' + value['title'] + '"';
+                    $.get(SPOTIFY_METADATA_API_ENDPOINT, {q:query}, function(trackInfo){
+                        var isAvailable = 'no';
+                        if ('tracks' in trackInfo && trackInfo['tracks'].length > 0 && 'href' in trackInfo['tracks'][0]) {
+                            var idx = 0;
+                            var flag = false;
+                            if (countryCode !== null) {
+                                for (; idx < trackInfo['tracks'].length; idx++) {
+                                    if (trackInfo['tracks'][idx]['album']['availability']['territories']
+                                            && (trackInfo['tracks'][idx]['album']['availability']['territories'].indexOf(countryCode) != -1
+                                                || trackInfo['tracks'][idx]['album']['availability']['territories'].indexOf('worldwide') != -1)) {
+                                        flag = true;
+                                        break;
+                                    }
+                                }
+                            } else {
+                                flag = true;
+                            }
+                            if (flag === true) {
+                                isAvailable = '<span class="ok">ok</span>';
+                                $('textarea').val($('textarea').val()+trackInfo['tracks'][idx]['href']+"\n");
+                            }
+                        }
+                        $('tbody').append('<tr><td>' + value['artist'] + '</td><td>' + value['title'] + '</td><td>' + isAvailable + '</td></tr>');
+                        if (index === data.length - 1) {
+                            $('textarea').focus().select();
+                        }
+                    });
+                }, 110); // no more than 10 requests per second
+            });
+        });
+        $queue.dequeue();
     });
 });
 </script>
@@ -69,7 +107,7 @@ chrome.extension.onRequest.addListener(function(data){
 <h1>Pandora --&gt; Spotify</h1>
 <div class="message" id="error">The current page does not have any thumbs-up tracks. Please access your Pandora station page. <a href="http://zuzara.com/blog/2011/07/23/extracting-thumbs-up-tracks-on-pandora-paste-into-spotify-playlist/" target="_blank">Feel free to ask any questions</a>.</div>
 <div style="display:none;" class="message" id="done">
-    <p>Now, simply copy and paste the below text into Spotify playlist!</p>
+    <p>Now, simply copy and paste the below text into your Spotify playlist!</p>
     <textarea></textarea>
 </div>
 <table style="display:none;">
