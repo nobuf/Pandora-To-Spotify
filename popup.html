@@ -54,9 +54,6 @@ $(document).ready(function(){
                 $queue.dequeue();
             });
         });
-        chrome.tabs.executeScript(null, {file: "jquery-1.6.2.min.js"}, function(){
-            chrome.tabs.executeScript(null, {file: "content_script.js"});
-        });
     }).queue(function(){
 
         chrome.extension.onRequest.addListener(function(data){
@@ -97,6 +94,9 @@ $(document).ready(function(){
                     });
                 }, 110); // no more than 10 requests per second
             });
+        });
+        chrome.tabs.executeScript(null, {file: "jquery-1.6.2.min.js"}, function(){
+            chrome.tabs.executeScript(null, {file: "content_script.js"});
         });
         $queue.dequeue();
     });
