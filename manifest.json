@@ -1,6 +1,6 @@
 {
   "name": "Pandora to Spotify Playlist Converter",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Grab thumbs-up tracks from Pandora and make Spotify playlist",
   "permissions": [
     "tabs",
@@ -14,7 +14,7 @@
   },
   "browser_action": {
       "default_title": "Grab thumbs-up tracks",
-      "default_icon": "icon19.png",
-      "popup": "popup.html"
+      "default_icon": "icon48.png",
+      "popup": "pandoratospotify.html"
   }
 }

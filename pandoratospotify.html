@@ -1,37 +1,146 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Untitled Document</title>
+
+
+<link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'>
+
 <style>
 body {
-width:400px;
+background: url(gradient-bg.png) repeat-y center;
+font-family: 'Droid Sans', sans-serif;
+font-size:14px;
+
 }
+
+a {
+color:#000;
+}
+
+
 p {
 margin:0;
 }
-.ok {
-color:green;
+
+h1 {
+	
+	margin:0;
+	font-size:13px;
+	color:#FFF;
+	text-transform:uppercase;
+	padding:12px 60px;
+	background: url(logo.png) no-repeat 20px 3px;
+	line-height:18px;
+	text-shadow:-1px -1px 0 #333;
+	letter-spacing:2px;
 }
+
 .message {
-padding:5px 10px;
-background:#EEE;
+padding:10px;
+background:#CCC url(message-bg.png) ;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border-radius: 6px;
+	font-size:12px;
+	margin-bottom:20px;
+	color:#333;
+	border:4px solid #1A1A1A;
+	margin:10px 20px;
 }
+
+.message p {
+	margin-bottom:10px;
+
+}
+
+
 textarea {
 width:100%;
 }
 table {
 width:100%;
-margin-top:20px;
 border-collapse:collapse;
+
+
 }
 td {
 padding: 8px;
-border-bottom:1px solid #CCC;
-font-size:14px;
+font-size:12px;
+margin-bottom:10px;
+background:  #272727 url(list-bg.png) repeat-x top; 
+color:#CCC;
+
 }
+
+
+
 th {
-padding: 8px;
-border-bottom:2px solid #999;
+padding:4px 8px 2px;
+background: url(header-bg.png) repeat-x top;
+font-size:11px;
+text-transform:uppercase;
+color:#333;
+text-shadow:1px 1px 0 #fff;
+
 }
+
+tr {
+	color:#FFF;
+	
+	
+}
+
+#container {background: url(header-background-grey.jpg) repeat-x top;
+margin:0 auto;
+padding:0 0 40px;
+width:400px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border-radius: 6px;
+	border:5px solid #000;
+}
+
+span.alert {
+	background-image:url(ok-error.png);
+	background-repeat:no-repeat;
+	text-indent:-9999px;
+	display: block;
+	width:24px;
+	height:24px;
+	margin:0 auto;
+	
+}
+
+.ok {
+	background-position:top;
+}
+
+.no {
+	background-position:bottom;
+}
+
+
+#table-wrapper {
+	background:#1A1A1A;
+	border:1px solid #333;
+	padding:5px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border-radius: 6px;
+	margin:20px;
+}
+
+#header {
+	background: url(glossy.png) repeat-x center;
+	border-top:1px solid #666;
+	border-bottom:1px solid #333;
+	margin-bottom:10px;
+}
+ 
 </style>
+
 <script src="jquery-1.6.2.min.js"></script>
 <script>
 var SPOTIFY_METADATA_API_ENDPOINT = 'http://ws.spotify.com/search/1/track.json';
@@ -61,14 +170,14 @@ $(document).ready(function(){
         chrome.extension.onRequest.addListener(function(data){
             if (data && data.length > 0) {
                 $('#error').hide();
-                $('table').show();
+                $('#table-wrapper').show();
                 $('#done').fadeIn();
             }
             $.each(data, function(index, value){
                 window.setTimeout(function(){
                     var query = 'artist:"' + value['artist'] + '"+track:"' + value['title'] + '"';
                     $.get(SPOTIFY_METADATA_API_ENDPOINT, {q:query}, function(trackInfo){
-                        var isAvailable = 'no';
+                        var isAvailable = false;
                         if ('tracks' in trackInfo && trackInfo['tracks'].length > 0 && 'href' in trackInfo['tracks'][0]) {
                             var idx = 0;
                             var flag = false;
@@ -85,11 +194,14 @@ $(document).ready(function(){
                                 flag = true;
                             }
                             if (flag === true) {
-                                isAvailable = '<span class="ok">ok</span>';
+                                isAvailable = true;
                                 $('textarea').val($('textarea').val()+trackInfo['tracks'][idx]['href']+"\n");
                             }
                         }
-                        $('tbody').append('<tr><td>' + value['artist'] + '</td><td>' + value['title'] + '</td><td>' + isAvailable + '</td></tr>');
+                        $('tbody').append('<tr><td>' + value['artist'] + '</td><td>' + value['title'] + '</td><td>' + (function(flag){
+                            var okOrNo = flag ? 'ok' : 'no';
+                            return '<span class="alert ' + okOrNo + '">' + okOrNo + '</span>';
+                        }(isAvailable)) + '</td></tr>');
                         if (index === data.length - 1) {
                             $('textarea').focus().select();
                         }
@@ -105,14 +217,20 @@ $(document).ready(function(){
 });
 </script>
 </head>
+
 <body>
-<h1>Pandora --&gt; Spotify</h1>
+<div id="container">
+<div id="header">
+
+<h1>Pandora to Spotify</h1>
+</div>
 <div class="message" id="error">The current page does not have any thumbs-up tracks. <a href="http://www.pandora.com/#/profile/stations" target="_blank">Please access your Pandora station page</a>. <a href="http://zuzara.com/blog/2011/07/23/extracting-thumbs-up-tracks-on-pandora-paste-into-spotify-playlist/" target="_blank">Feel free to ask any questions</a>.</div>
-<div style="display:none;" class="message" id="done">
+<div class="message" id="done" style="display:none;">
     <p>Now, simply copy and paste the below text into your Spotify playlist!</p>
     <textarea></textarea>
 </div>
-<table style="display:none;">
+<div id="table-wrapper" style="display:none;">
+<table>
     <thead>
     <tr>
         <th>Artist</th>
@@ -122,5 +240,7 @@ $(document).ready(function(){
     </thead>
     <tbody></tbody>
 </table>
+</div>
+</div>
 </body>
 </html>
