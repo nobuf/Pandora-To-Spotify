@@ -71,7 +71,7 @@ tr {
 color:#FFF;
 }
 
-#container {background: url(../images/header-background-grey.jpg) repeat-x top;
+#container {background: #1E1E1E url(../images/header-background-grey.jpg) repeat-x top;
 margin:0 auto;
 padding:0 0 40px;
 width:400px;
