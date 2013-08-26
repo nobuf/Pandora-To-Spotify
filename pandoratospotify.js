@@ -2,7 +2,8 @@
 var SPOTIFY_METADATA_API_ENDPOINT = 'http://ws.spotify.com/search/1/track.json';
 var GOOGLE_GEOCODING_API_ENDPOINT = 'http://maps.googleapis.com/maps/api/geocode/json';
 var countryCode = null;
-$(document).ready(function(){
+
+$(document).ready(function(){	
     var $queue = $('<div></div>');
     $queue.queue(function(){
         navigator.geolocation.getCurrentPosition(function(position){
