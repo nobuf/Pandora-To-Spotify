@@ -1,3 +1,5 @@
 (function(){
-  chrome.extension.sendRequest(Thumbups.get());
+  Thumbups.get(function(tracks){
+    chrome.extension.sendRequest(tracks);
+  });
 })();

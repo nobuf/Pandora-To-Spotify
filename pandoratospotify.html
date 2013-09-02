@@ -12,27 +12,27 @@
 
 <body>
 <div id="container">
-<div id="header">
-
-<h1>Pandora to Spotify</h1>
-</div>
-<div class="message" id="error">The current page does not have any thumbs-up tracks. Please access your Pandora <a href="http://www.pandora.com/#!/profile/bookmarks" target="_blank">Bookmarks</a> or <a href="http://www.pandora.com/#!/profile/likes" target="_blank">Likes</a> or each station page</a>. <a href="http://zuzara.com/blog/2011/07/23/extracting-thumbs-up-tracks-on-pandora-paste-into-spotify-playlist/" target="_blank">Feel free to ask any questions</a>.</div>
-<div class="message" id="done" style="display:none;">
+  <div id="header">
+    <h1>Pandora to Spotify</h1>
+  </div>
+  <div class="message" id="loading">Loading...</div>
+  <div class="message hide" id="error">The current page does not have any thumbs-up tracks. Access your Pandora <a href="http://www.pandora.com/#!/profile/bookmarks" target="_blank">Bookmarks</a> or <a href="http://www.pandora.com/#!/profile/likes" target="_blank">Likes</a> or each station page. <a href="http://zuzara.com/blog/2011/07/23/extracting-thumbs-up-tracks-on-pandora-paste-into-spotify-playlist/" target="_blank">Feel free to ask any questions</a>.</div>
+  <div class="message hide" id="done">
     <p>Now, simply copy and paste the below text into your Spotify playlist!</p>
     <textarea></textarea>
-</div>
-<div id="table-wrapper" style="display:none;">
-<table>
-    <thead>
-    <tr>
-        <th>Artist</th>
-        <th>Track</th>
-        <th>Spotify</th>
-    </tr>
-    </thead>
-    <tbody></tbody>
-</table>
-</div>
+  </div>
+  <div id="table-wrapper" class="hide">
+    <table>
+      <thead>
+        <tr>
+          <th>Artist</th>
+          <th>Track</th>
+          <th>Spotify</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 </div>
 </body>
 </html>
