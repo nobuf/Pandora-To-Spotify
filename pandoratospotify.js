@@ -68,7 +68,7 @@ $(document).ready(function(){
         }, 110); // no more than 10 requests per second
       });
     });
-    chrome.tabs.executeScript(null, {file: "lib/jquery-1.7.min.js"}, function(result){
+    chrome.tabs.executeScript(null, {file: "lib/jquery-2.0.3.min.js"}, function(result){
       if (undefined === result) {
         $('#loading').hide();
         $('#error').fadeIn();
